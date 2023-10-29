@@ -6,6 +6,12 @@ product page to retrieve data from meta tags.
 
 All scraped information is saved to a CSV file (products.csv)
 
+#### Why is this useful?
+
+Unfortunately, the /products.json endpoint does not contain meta tags. To export all product parameters, it is necessary to query each product directly.
+
+That's why a script was created. To do it automatically!
+
 ### 🔥 Installation
 ```
 git clone https://github.com/grabowskiadrian/shopify-products-scraper.git
