@@ -1,3 +1,5 @@
+<a href="https://www.buymeacoffee.com/adriangrabj" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 150px !important;" ></a>
+
 # Shopify Products Scraper
 
 This is Shopify products Scraper. The script retrieves data from the products.json file of Shopify shop. 
