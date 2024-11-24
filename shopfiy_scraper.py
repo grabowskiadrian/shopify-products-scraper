@@ -1,6 +1,8 @@
 import csv
 import json
 import urllib.request
+import requests
+import pandas as pd
 import argparse
 
 from bs4 import BeautifulSoup
@@ -41,6 +43,13 @@ def get_tags_from_product(product):
 
     return [title, description]
 
+def get_inventory_from_product(product_url):
+    get_product = requests.get(product_url)
+    product_json = get_product.json()
+    product_variants = pd.DataFrame(product_json['product']['variants'])
+
+    return product_variants
+
 
 with open('products.csv', 'w') as f:
     page = 1
@@ -50,7 +59,16 @@ with open('products.csv', 'w') as f:
     # create file header
     writer = csv.writer(f)
     if with_variants:
-        writer.writerow(['Name', 'Variant Name', 'Price', 'URL', 'Meta Title', 'Meta Description', 'Product Description'])
+        writer.writerow([
+            'Name', 'Variant ID', 'Product ID', 'Variant Title', 'Price', 'SKU', 
+            'Position', 'Inventory Policy', 'Compare At Price', 'Fulfillment Service',
+            'Inventory Management', 'Option1', 'Option2', 'Option3', 'Created At',
+            'Updated At', 'Taxable', 'Barcode', 'Grams', 'Image ID', 'Weight',
+            'Weight Unit', 'Inventory Quantity', 'Old Inventory Quantity',
+            'Tax Code', 'Requires Shipping', 'Quantity Rule', 'Price Currency',
+            'Compare At Price Currency', 'Quantity Price Breaks',
+            'URL', 'Meta Title', 'Meta Description', 'Product Description'
+        ])
     else:
         writer.writerow(['Name', 'URL', 'Meta Title', 'Meta Description', 'Product Description'])
 
@@ -72,11 +90,23 @@ with open('products.csv', 'w') as f:
             title, description = get_tags_from_product(product_url)
 
             if with_variants:
-                for variant in product['variants']:
-                    variant_name = variant['title']
-                    price = variant['price']
-
-                    row = [name, variant_name, price, product_url, title, description, body_description]
+                variants_df = get_inventory_from_product(product_url + '.json')
+                for _, variant in variants_df.iterrows():
+                    row = [
+                        name, variant['id'], variant['product_id'], variant['title'],
+                        variant['price'], variant['sku'], variant['position'],
+                        variant['inventory_policy'], variant['compare_at_price'],
+                        variant['fulfillment_service'], variant['inventory_management'],
+                        variant['option1'], variant['option2'], variant['option3'],
+                        variant['created_at'], variant['updated_at'], variant['taxable'],
+                        variant['barcode'], variant['grams'], variant['image_id'],
+                        variant['weight'], variant['weight_unit'], variant['inventory_quantity'],
+                        variant['old_inventory_quantity'], variant['tax_code'],
+                        variant['requires_shipping'], variant['quantity_rule'],
+                        variant['price_currency'], variant['compare_at_price_currency'],
+                        variant['quantity_price_breaks'],
+                        product_url, title, description, body_description
+                    ]
                     writer.writerow(row)
             else:
                 row = [name, product_url, title, description, body_description]
